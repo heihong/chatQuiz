@@ -10,26 +10,54 @@
                 padding: 2px;
             }
         </style>
+		 <link href="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+    rel="stylesheet">
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     </head>
  
     <body>
-        <h1>Le super Chat temps réel !</h1>
-				<div id="pseudo_user"></div>
-		<div id="user">
-        <form action="/" method="post" id="connection">
-            <input type="text" name="pseudo" id="pseudo" placeholder="Veuillez saisir votre pseudo" size="50"/>
-            <input type="submit" id="envoi_pseudo" value="Connection" onclick="hideShow()"/>
-        </form>
-		</div>
-		<div id="chat_user">
-		<form action="/" method="post" id="chat">
-            <input type="text" name="message" id="message" placeholder="Veuillez saisir votre message" size="50"/>
-            <input type="submit" id="envoi_message" value="Envoyer"/>
-        </form>
-		</div>
-        <section id="zone_chat">
+		<div class="container">
+		   <div class="row">
+				<div class="col-md-8 col-md-offset-2">
+				 <h1 class="text-center text-primary">
+				   <span class="glyphicon glyphicon-user pull-left"></span>Bienvenue sur notre jeu de quiz</h1>
+				    <hr>
+					<div class="row">
+					  <div class="col-md-12">
+					  <div id="pseudo_user"></div>
+						<div id="user">
+							<form action="/" method="post" id="connection">
+								<div class="form-group">
+									<input type="text"  class="form-control" name="pseudo" id="pseudo" placeholder="Veuillez saisir votre pseudo" size="50"/>
+								</div>	
+								<button type="submit" class="btn btn-block btn-info" id="envoi_pseudo" onclick="hideShow()">Connection</button>
+								
+							</form>
+						</div>
+						 <section id="zone_chat">
             
-        </section>
+						</section>
+						<div id="chat_user">
+							<form action="/" method="post" id="chat">
+							<div class="input-group">
+								<input type="text" class="form-control" name="message" id="message" placeholder="Veuillez saisir votre message" size="50"/>
+								 <span class="input-group-btn">
+								<button type="submit" class="btn btn-primary" id="envoi_message"><span class="glyphicon glyphicon-envelope"></span> Envoyer</button>
+								 </span>
+							</div>
+							</form>
+						</div>
+					  </div>
+					</div>
+				</div>
+		   </div>
+		</div>
+       
+				
+		
+		
+       
 
 
         <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -57,7 +85,7 @@
 			
 			
 			socket.on('pseudo', function(pseudo) {
-                $('#zone_chat').prepend('<p><em>' + pseudo + ' a rejoint le Chat !</em></p>');
+                $('#zone_chat').prepend('<p class="form-control-static"><em>' + pseudo + ' a rejoint le Chat !</em></p>');
             });
 			
 			$(document).ready(function(){
@@ -71,17 +99,17 @@
             });
 			
 			socket.on('message', function(data) {
-                $('#zone_chat').prepend('<p><b>'+data.pseudo+'</b>: '+data.message+'</p>');
+                $('#zone_chat').prepend('<p class="form-control-static"><b>'+data.pseudo+'</b>: '+data.message+'</p>');
             });
 		
 			// Ajoute un message dans la page
             function insereMessage(pseudo,message) {
-                $('#zone_chat').prepend('<p><b>'+pseudo+'</b>: '+message+'</p>');
+                $('#zone_chat').prepend('<p class="form-control-static"><b>'+pseudo+'</b>: '+message+'</p>');
             };
 			
 				// Ajoute un message dans la page
             function inserePseudo(pseudo) {
-                $('#pseudo_user').prepend('<p>Votre pseudo: <b>'+pseudo+'</b></p>');
+                $('#pseudo_user').prepend('<h3 class="text-center">Votre pseudo: <b>'+pseudo+'</b></h3>');
             };
            function hideShow()
 		   {
