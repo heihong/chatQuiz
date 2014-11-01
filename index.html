@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Super Chat temps réel !</title>
+        <style>
+            #zone_chat strong {
+                color: white;
+                background-color: black;
+                padding: 2px;
+            }
+        </style>
+    </head>
+ 
+    <body>
+        <h1>Le super Chat temps réel !</h1>
+				<div id="pseudo_user"></div>
+		<div id="user">
+        <form action="/" method="post" id="connection">
+            <input type="text" name="pseudo" id="pseudo" placeholder="Veuillez saisir votre pseudo" size="50"/>
+            <input type="submit" id="envoi_pseudo" value="Connection" onclick="hideShow()"/>
+        </form>
+		</div>
+		<div id="chat_user">
+		<form action="/" method="post" id="chat">
+            <input type="text" name="message" id="message" placeholder="Veuillez saisir votre message" size="50"/>
+            <input type="submit" id="envoi_message" value="Envoyer"/>
+        </form>
+		</div>
+        <section id="zone_chat">
+            
+        </section>
+
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+            // Connexion à socket.io
+            var socket = io.connect('http://localhost:8888');
+			var pseudo='';
+			$(document).ready(function(){
+			 $('#chat_user').hide();
+			 })
+			$(document).ready(function(){
+			
+            // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
+				$('#connection').submit(function () {
+					pseudo = $('#pseudo').val();
+					socket.emit('pseudo', pseudo); // Transmet le message aux autres
+					inserePseudo(pseudo);
+					$('#pseudo').val('').focus();// Vide la zone de Chat et remet le focus dessus
+					return false; // Permet de bloquer l'envoi "classique" du formulaire
+				});
+            
+			});
+			
+			
+			socket.on('pseudo', function(pseudo) {
+                $('#zone_chat').prepend('<p><em>' + pseudo + ' a rejoint le Chat !</em></p>');
+            });
+			
+			$(document).ready(function(){
+			   $('#chat').submit(function () {
+					var message = $('#message').val();
+					socket.emit('message', message); // Transmet le message aux autres
+					insereMessage(pseudo,message); // Affiche le message aussi sur notre page
+					$('#message').val('').focus(); // Vide la zone de Chat et remet le focus dessus 
+					return false; // Permet de bloquer l'envoi "classique" du formulaire
+				});
+            });
+			
+			socket.on('message', function(data) {
+                $('#zone_chat').prepend('<p><b>'+data.pseudo+'</b>: '+data.message+'</p>');
+            });
+		
+			// Ajoute un message dans la page
+            function insereMessage(pseudo,message) {
+                $('#zone_chat').prepend('<p><b>'+pseudo+'</b>: '+message+'</p>');
+            };
+			
+				// Ajoute un message dans la page
+            function inserePseudo(pseudo) {
+                $('#pseudo_user').prepend('<p>Votre pseudo: <b>'+pseudo+'</b></p>');
+            };
+           function hideShow()
+		   {
+			$(document).ready(function(){
+			   $('#user').hide();
+			   $('#chat_user').show();
+			 })
+		   }
+        </script>
+    </body>
+</html>
+
