@@ -1,44 +1,104 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Super Chat temps réel !</title>
-        <style>
-            #zone_chat strong {
-                color: white;
-                background-color: black;
-                padding: 2px;
-            }
-        </style>
-		 <link href="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
-    rel="stylesheet">
-    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    </head>
- 
-    <body>
-		<div class="container">
-		   <div class="row">
-				<div class="col-md-8 col-md-offset-2">
-				 <h1 class="text-center text-primary">
-				   <span class="glyphicon glyphicon-user pull-left"></span>Bienvenue sur notre jeu de quiz</h1>
-				    <hr>
-					<div class="row">
-					  <div class="col-md-12">
-					  <div id="pseudo_user"></div>
-						<div id="user">
-							<form action="/" method="post" id="connection">
-								<div class="form-group">
-									<input type="text"  class="form-control" name="pseudo" id="pseudo" placeholder="Veuillez saisir votre pseudo" size="50"/>
-								</div>	
+	<head>
+	   <meta charset="utf-8" />
+	   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	    <title>Jeux de quiz</title>
+	    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/main.css" />
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		 <script src="/socket.io/socket.io.js"></script>
+		 <script>
+		 var socket = io.connect();
+		 var pseudo='';
+		 $(document).ready(function(){
+		  $('#chat_user').hide();
+		})
+		
+		$(document).ready(function(){
+			
+            // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
+				$('#connection').submit(function (event) {
+					event.preventDefault();
+					pseudo=$('#pseudo').val();
+					socket.emit('login', {pseudo:$('#pseudo').val(),password:$('#password').val()}); // Transmet le message aux autres
+					inserePseudo(pseudo);
+					
+				});
+		  });
+		  
+		 
+			socket.on('pseudo', function(pseudo) {
+                $('#zone_chat').append('<p class="form-control-static"><em><b>'+pseudo + '</b> a rejoint le Chat !</em></p>');
+          });
+		  
+			// Ajoute un message dans la page
+            function inserePseudo(pseudo) {
+                $('#pseudo_user').append('<h3 class="text-center form-control-static">Votre pseudo: <b>'+pseudo+'</b></h3>');
+            };
+			function hideShow()
+		   {
+			$(document).ready(function(){
+			   $('#user').hide();
+			   $('#chat_user').show();
+			 })
+		   }
+		   
+		   
+			$(document).ready(function(){
+			   $('#chat').submit(function (event) {
+					event.preventDefault();
+					var message = $('#message').val();
+					socket.emit('message', message); // Transmet le message aux autres
+					insereMessage(message); // Affiche le message aussi sur notre page
+					$('#message').val('').focus(); // Vide la zone de Chat et remet le focus dessus 
+
+				});
+            });
+			
+			socket.on('message', function(data) {
+                $('#zone_chat').append('<p class="form-control-static color-info"><b>'+data.pseudo+'</b>: '+data.message+'</p>');
+            });
+		
+			// Ajoute un message dans la page
+            function insereMessage(message) {
+                $('#zone_chat').append('<p class="form-control-static"><b>'+'moi'+'</b>: '+message+'</p>');
+            };
+		 </script>
+	</head>
+	<body>
+	<div class="container">
+	  <div class="row-fuild">
+	  	<div class="col-sm-12 col-xs-12">
+		<h1 class="text-center text-info">
+			<span class="glyphicon glyphicon-user pull-left" ></span>Jeu de quiz</h1>
+			<hr>
+		</div>
+		<div class="row-fuild">
+			 <div class="col-sm-12  col-xs-12">
+				 <div id="pseudo_user"></div>
+				 <br/>
+					<div id="user" >
+						<form action="/" method="post" id="connection">
+							<div class="form-group">
+								<input type="text"  class="form-control" name="pseudo" id="pseudo" placeholder="Veuillez saisir votre pseudo" size="50"/>
+								<input type="password"  class="form-control" name="password" id="password" placeholder="Veuillez saisir votre mot de passe" size="50"/>
+							</div>	
 								<button type="submit" class="btn btn-block btn-info" id="envoi_pseudo" onclick="hideShow()">Connection</button>
-								
-							</form>
-						</div>
-						 <section id="zone_chat">
-            
-						</section>
-						<div id="chat_user">
+										
+						</form>
+					</div>
+			 </div>
+			 
+			<div class="row-fuild">
+				<div class="col-sm-12 col-xs-12">
+					 <section id="zone_chat" class="scroll"></section>
+				</div>
+			</div>
+			<div class="row-fuid">
+				<div class="col-sm-12 col-xs-12">
+					<div id="chat_user" class="form-group"">
 							<form action="/" method="post" id="chat">
 							<div class="input-group">
 								<input type="text" class="form-control" name="message" id="message" placeholder="Veuillez saisir votre message" size="50"/>
@@ -47,78 +107,11 @@
 								 </span>
 							</div>
 							</form>
-						</div>
-					  </div>
 					</div>
 				</div>
-		   </div>
-		</div>
-       
-				
-		
-		
-       
-
-
-        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
-
-            // Connexion à socket.io
-            var socket = io.connect('http://localhost:8888');
-			var pseudo='';
-			$(document).ready(function(){
-			 $('#chat_user').hide();
-			 })
-			$(document).ready(function(){
-			
-            // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
-				$('#connection').submit(function () {
-					pseudo = $('#pseudo').val();
-					socket.emit('pseudo', pseudo); // Transmet le message aux autres
-					inserePseudo(pseudo);
-					$('#pseudo').val('').focus();// Vide la zone de Chat et remet le focus dessus
-					return false; // Permet de bloquer l'envoi "classique" du formulaire
-				});
-            
-			});
-			
-			
-			socket.on('pseudo', function(pseudo) {
-                $('#zone_chat').prepend('<p class="form-control-static"><em>' + pseudo + ' a rejoint le Chat !</em></p>');
-            });
-			
-			$(document).ready(function(){
-			   $('#chat').submit(function () {
-					var message = $('#message').val();
-					socket.emit('message', message); // Transmet le message aux autres
-					insereMessage(pseudo,message); // Affiche le message aussi sur notre page
-					$('#message').val('').focus(); // Vide la zone de Chat et remet le focus dessus 
-					return false; // Permet de bloquer l'envoi "classique" du formulaire
-				});
-            });
-			
-			socket.on('message', function(data) {
-                $('#zone_chat').prepend('<p class="form-control-static"><b>'+data.pseudo+'</b>: '+data.message+'</p>');
-            });
-		
-			// Ajoute un message dans la page
-            function insereMessage(pseudo,message) {
-                $('#zone_chat').prepend('<p class="form-control-static"><b>'+pseudo+'</b>: '+message+'</p>');
-            };
-			
-				// Ajoute un message dans la page
-            function inserePseudo(pseudo) {
-                $('#pseudo_user').prepend('<h3 class="text-center">Votre pseudo: <b>'+pseudo+'</b></h3>');
-            };
-           function hideShow()
-		   {
-			$(document).ready(function(){
-			   $('#user').hide();
-			   $('#chat_user').show();
-			 })
-		   }
-        </script>
-    </body>
+			</div>
+		 </div>
+	  </div>
+	</div>
+	</body>
 </html>
-

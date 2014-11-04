@@ -1,11 +1,15 @@
 {
-    "name": "super-chat",
-    "version": "0.1.0",
-    "dependencies": {
-        "express": "~3.3.4",
-        "socket.io": "~0.9.16",
-        "ent": "~0.1.0"
+    "name": "Quiz-Game",
+	"description": "Quiz Game project",
+	"version": "0.0.1",
+	"dependencies": {
+        "express": "2.5.5",
+		"socket.io": "0.9.1-1",
+	   "ent": "~0.1.0",
+	   "pg": "2.x"
     },
-    "author": "Mateo21 <mateo21@email.com>",
-    "description": "Un super Chat temps réel avec socket.io"
+	"engines": {
+    "node": "0.6.12",
+    "npm": "1.1.4"
+  }
 }
