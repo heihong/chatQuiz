@@ -21,6 +21,7 @@ var db = new sqlite3.Database(dbFile);
  */
 
 var app = express.createServer();
+app.use(express.bodyParser());
 
 /**
  * App configuration.
@@ -88,6 +89,22 @@ app.get('/signin',function(req,res){
 
 });
 
+app.post('/signin',function(req,res){
+	console.log(req.body.user.login);
+	
+	db.serialize(function() {
+  
+  
+	var stmt = db.prepare("INSERT INTO users VALUES(NULL,?,?,0)");
+  
+	stmt.run(req.body.user.login, req.body.user.password); 
+	stmt.finalize();
+});
+	
+  res.sendfile( '/signin.html' , {root:__dirname});
+
+});
+
 /**
  * App listen.
  */
@@ -114,11 +131,29 @@ var users=[];
 io.sockets.on('connection', function (socket) {
 	 // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
     socket.on('login', function (user) {
-            pseudo = ent.encode(user.pseudo);
+         pseudo = ent.encode(user.pseudo);
 			password= ent.encode(user.password);
+			
+		var dbPassword = "";
+		
+		db.serialize(function() {  
+			  db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
+					console.log(row.login);
+					dbPassword = row.password;
+			  });
+			});
+		
+		   
+			if(password == dbPassword) {
 			socket.set('pseudo', pseudo);
 			users.push({pseudo:pseudo,password:password});
             socket.broadcast.emit('pseudo', pseudo);
+		   }
+		   else {
+		   	 // wrong password or login
+		   }
+			
+			
         
     });  
 	

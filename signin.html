@@ -1,12 +1,45 @@
 <!DOCTYPE html>
 <html>
-<body>
-
-<p>A script on this page starts this clock:</p>
-
-
-
-
-
-</body>
+	<head>
+	   <meta charset="utf-8" />
+	   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	    <title>Jeux de quiz</title>
+	    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/main.css" />
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		
+	</head>
+	<body>
+	<div class="container">
+	  <div class="row-fuild">
+	  	<div class="col-sm-12 col-xs-12">
+		<h1 class="text-center text-info">
+			<span class="glyphicon glyphicon-user pull-left" ></span>Jeu de quiz - Inscription</h1>
+			<hr>
+		</div>
+		<div class="row-fuild">
+			 <div class="col-sm-12  col-xs-12">
+				 <div id="pseudo_user"></div>
+				 <div id="timer"></div>
+				 <br/>
+					<div id="user" >
+						<form action="/signin" method="post" id="inscription">
+							<div class="form-group">
+								<input type="text"  class="form-control" name="user[login]" id="user[login]" placeholder="Veuillez saisir votre pseudo" size="50"/>
+								<input type="password"  class="form-control" name="user[password]" id="user[password]" placeholder="Veuillez saisir votre mot de passe" size="50"/>
+							</div>	
+								<button type="submit" class="btn btn-block btn-info" id="envoi_pseudo" onclick="">Inscription</button>
+										
+						</form>
+						<br />
+						<p><a href="/">Retour à l'accueil</a></p>
+					</div>
+			 </div>
+			 
+			
+		 </div>
+	  </div>
+	</div>
+	</body>
 </html>
