@@ -7,6 +7,14 @@ var express = require('express'),
 	sio = require('socket.io');
 	
 var pg = require('pg');
+var fs = require("fs");
+var sqlite3 = require("sqlite3").verbose();
+
+
+var dbFile = "quiz.sqlite";
+var exists = fs.existsSync(dbFile);
+var db = new sqlite3.Database(dbFile);
+
 
 /**
  * App.
@@ -33,6 +41,31 @@ app.configure(function () {
     });
   });
 }) */
+
+function Question (id, question, response) {
+	this.id = id;
+	this.question = question;
+	this.response = response;
+}
+
+var currentQuestion;
+
+function getRandomQuestion() {
+	
+
+	db.serialize(function() { 
+
+		db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1;", function(err, row) {
+			 console.log(row.question + ": " + row.reponse);
+			 currentQuestion = new Question (row.id, row.question, row.reponse);
+		});
+		  
+	});
+}
+
+
+
+
 
 /**
  * App routes.
@@ -76,6 +109,13 @@ io.sockets.on('connection', function (socket) {
         
     });  
 	
+	
+	socket.on('disconnect', function() {
+      console.log('User disconnect!');
+
+   });
+   
+   
 	    // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
     socket.on('message', function (message) {
 			 socket.get('pseudo', function (error, pseudo) {
