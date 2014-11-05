@@ -83,6 +83,11 @@ app.get('/', function (req, res) {
  res.sendfile(__dirname + '/index.html');
 });
 
+app.get('/signin',function(req,res){
+  res.sendfile( '/signin.html' , {root:__dirname});
+
+});
+
 /**
  * App listen.
  */
