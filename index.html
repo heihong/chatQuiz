@@ -14,6 +14,7 @@
 		 var pseudo='';
 		 $(document).ready(function(){
 		  $('#chat_user').hide();
+		  $('#timer').hide();
 		  $('#zone_chat').hide();
 		})
 		
@@ -58,6 +59,7 @@
 			$(document).ready(function(){
 			   $('#user').hide();
 			   $('#chat_user').show();
+			   $('#timer').show();
 			 })
 		   }
 		   
@@ -112,7 +114,7 @@
 								<input type="text"  class="form-control" name="pseudo" id="pseudo" placeholder="Veuillez saisir votre pseudo" size="50"/>
 								<input type="password"  class="form-control" name="password" id="password" placeholder="Veuillez saisir votre mot de passe" size="50"/>
 							</div>	
-								<button type="submit" class="btn btn-block btn-info" id="envoi_pseudo" onclick="hideShow()">Connection</button>
+								<button type="submit" class="btn btn-block btn-info" id="envoi_pseudo" onclick="hideShow()">Connexion</button>
 										
 						</form>
 					</div>
