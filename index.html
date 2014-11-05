@@ -32,6 +32,10 @@
 			socket.on('pseudo', function(pseudo) {
                 $('#zone_chat').append('<p class="form-control-static"><em><b>'+pseudo + '</b> a rejoint le Chat !</em></p>');
           });
+          
+          socket.on('emit_question', function(question) {
+                $('#zone_chat').append('<p class="form-control-static">Nouvelle question :'+question+' </p>');
+          });
 		  
 			// Ajoute un message dans la page
             function inserePseudo(pseudo) {

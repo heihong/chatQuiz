@@ -49,22 +49,31 @@ function Question (id, question, response) {
 }
 
 var currentQuestion;
+var timerDuration = 10000;
 
-function getRandomQuestion() {
-	
 
-	db.serialize(function() { 
-
-		db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1;", function(err, row) {
-			 console.log(row.question + ": " + row.reponse);
-			 currentQuestion = new Question (row.id, row.question, row.reponse);
-		});
-		  
-	});
-}
+db.serialize(function() {  
+  db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
+      console.log(row.id + ": " + row.question);
+      currentQuestion = new Question (row.id, row.question, row.reponse);
+  });
+});
 
 
 
+
+
+// timer
+setInterval(function(){
+ 
+  db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
+      console.log(row.id + ": " + row.question);
+      currentQuestion = new Question (row.id, row.question, row.reponse);
+  });
+  
+  console.log('Timer Change question '+currentQuestion.question);
+  io.sockets.emit('emit_question', currentQuestion.question);
+}, timerDuration);  
 
 
 /**
