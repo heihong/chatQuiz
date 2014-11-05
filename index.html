@@ -14,16 +14,18 @@
 		 var pseudo='';
 		 $(document).ready(function(){
 		  $('#chat_user').hide();
+		  $('#zone_chat').hide();
 		})
 		
 		$(document).ready(function(){
-			
+
             // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
 				$('#connection').submit(function (event) {
 					event.preventDefault();
 					pseudo=$('#pseudo').val();
 					socket.emit('login', {pseudo:$('#pseudo').val(),password:$('#password').val()}); // Transmet le message aux autres
 					inserePseudo(pseudo);
+					$('#zone_chat').show();
 					
 				});
 		  });
@@ -31,10 +33,20 @@
 		 
 			socket.on('pseudo', function(pseudo) {
                 $('#zone_chat').append('<p class="form-control-static"><em><b>'+pseudo + '</b> a rejoint le Chat !</em></p>');
+                var elem = document.getElementById('zone_chat');
+  					elem.scrollTop = elem.scrollHeight;
           });
           
           socket.on('emit_question', function(question) {
-                $('#zone_chat').append('<p class="form-control-static">Nouvelle question :'+question+' </p>');
+                $('#zone_chat').append('<p class="form-control-static">Nouvelle question : '+question+' </p>');
+                var elem = document.getElementById('zone_chat');
+  					elem.scrollTop = elem.scrollHeight;
+          });
+          
+          socket.on('good_response', function(pseudo) {
+                $('#zone_chat').append('<p class="form-control-static"><em><b>'+pseudo + '</b> a trouvé la bonne réponse !</em></p>');
+                var elem = document.getElementById('zone_chat');
+  					elem.scrollTop = elem.scrollHeight;
           });
 		  
 			// Ajoute un message dans la page
@@ -60,6 +72,14 @@
 
 				});
             });
+            
+            socket.on('timer_update', function(time) {
+           
+    			$('#timer').html("Temps restant : "+time);
+    
+               
+            });
+       
 			
 			socket.on('message', function(data) {
                 $('#zone_chat').append('<p class="form-control-static color-info"><b>'+data.pseudo+'</b>: '+data.message+'</p>');
@@ -68,6 +88,8 @@
 			// Ajoute un message dans la page
             function insereMessage(message) {
                 $('#zone_chat').append('<p class="form-control-static"><b>'+'moi'+'</b>: '+message+'</p>');
+                var elem = document.getElementById('zone_chat');
+  					elem.scrollTop = elem.scrollHeight;
             };
 		 </script>
 	</head>
@@ -82,6 +104,7 @@
 		<div class="row-fuild">
 			 <div class="col-sm-12  col-xs-12">
 				 <div id="pseudo_user"></div>
+				 <div id="timer"></div>
 				 <br/>
 					<div id="user" >
 						<form action="/" method="post" id="connection">

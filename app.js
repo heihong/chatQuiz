@@ -30,17 +30,6 @@ app.configure(function () {
   app.use(express.static(__dirname + '/'));
 })
 
-/*app.get('/db', function (request, response) {
-  pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-    client.query('SELECT * FROM quiz_table', function(err, result) {
-      done();
-      if (err)
-       { console.error(err); response.send("Error " + err); }
-      else
-       { response.send(result.rows); }
-    });
-  });
-}) */
 
 function Question (id, question, response) {
 	this.id = id;
@@ -60,19 +49,29 @@ db.serialize(function() {
 });
 
 
-
-
-
 // timer
 setInterval(function(){
  
-  db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
+ 	
+  
+  console.log('Timer Change question '+currentQuestion.question);
+  io.sockets.emit('emit_question', currentQuestion.question);
+  var i = (timerDuration/1000);
+  var timer = setInterval(function(){  
+  		i--;
+	  io.sockets.emit('timer_update', i);
+	  
+	  if(i <= 0) {
+	  	i = (timerDuration/1000);
+	  	clearInterval(timer);
+	  }
+  }, 1000); 
+  
+ db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
       console.log(row.id + ": " + row.question);
       currentQuestion = new Question (row.id, row.question, row.reponse);
   });
   
-  console.log('Timer Change question '+currentQuestion.question);
-  io.sockets.emit('emit_question', currentQuestion.question);
 }, timerDuration);  
 
 
@@ -91,7 +90,7 @@ app.get('/', function (req, res) {
 var port = process.env.PORT || 3000;
 app.listen(port, function () {
   var addr = app.address();
-  console.log('   app listening on http://' + addr.address + ':' + addr.port);
+  console.log('app listening on http://' + addr.address + ':' + addr.port);
 });
 
 /**
@@ -129,7 +128,14 @@ io.sockets.on('connection', function (socket) {
     socket.on('message', function (message) {
 			 socket.get('pseudo', function (error, pseudo) {
             message = ent.encode(message);
-            socket.broadcast.emit('message', {pseudo: pseudo, message: message});
+            if(message.toLowerCase() == currentQuestion.response.toLowerCase()) {
+             	console.log('GOOD RESPONSE !!! '+currentQuestion.response);
+             	io.sockets.emit('good_response', pseudo);
+            }
+            else {
+            	socket.broadcast.emit('message', {pseudo: pseudo, message: message});
+            }
+           
 		});
         
     }); 
