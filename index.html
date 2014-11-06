@@ -92,6 +92,15 @@
             });
        
 		
+				socket.on('redirect', function() {
+				 $('#user').hide();
+			   $('#signin').hide();
+			   $('#chat_user').hide();
+			   $('#timer').hide();
+			   $('#best_players_update').hide();
+					window.location.replace("loginerror");
+				});
+		
 				socket.on('best_players_update', function(players) {
 				
 				

@@ -121,8 +121,24 @@ app.get('/', function (req, res) {
  res.sendfile(__dirname + '/index.html');
 });
 
+
+
 app.get('/signin',function(req,res){
   res.sendfile( '/signin.html' , {root:__dirname});
+
+});
+
+app.get('/signinerror',function(req,res){
+  res.sendfile( '/signinerror.html' , {root:__dirname});
+
+});
+app.get('/signinvalid',function(req,res){
+  res.sendfile( '/signinvalid.html' , {root:__dirname});
+
+});
+
+app.get('/loginerror',function(req,res){
+  res.sendfile( '/loginerror.html' , {root:__dirname});
 
 });
 
@@ -146,9 +162,11 @@ app.post('/signin',function(req,res){
 			  	var stmt = db.prepare("INSERT INTO users VALUES(NULL,?,?,0)");	  
 				stmt.run(login, password); 
 				stmt.finalize();
+				res.redirect('/signinvalid');
 				}
 				else {
 					// erreur le pseudo existe deja !!!!!!!!!!!!!
+						res.redirect('/signinerror');
 				}
 			});
   
@@ -208,7 +226,9 @@ io.sockets.on('connection', function (socket) {
 		         socket.broadcast.emit('pseudo', pseudo);
 				}
 				else {
+					socket.emit('redirect');
 					 // wrong password or login redirect with error
+					 
 				}
 			}
 			});
