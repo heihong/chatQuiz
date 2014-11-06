@@ -63,6 +63,11 @@ function getNewQuestion() {
   		});
 }
 
+function getBestPlayers() {
+		db.each("SELECT * FROM users ORDER BY points DESC LIMIT 5", function(err, row) {
+  			console.log("best player : "+row.login+" - "+row.points);
+  		});
+}
 
 setInterval(function(){
 
@@ -71,7 +76,7 @@ io.sockets.emit('time_finish', currentQuestion.reponse);
 currentQuestion = nextQuestion;
 
 getNewQuestion();
-
+getBestPlayers();
 		
  		io.sockets.emit('emit_question', currentQuestion.question);
   	
