@@ -35,10 +35,11 @@ app.configure(function () {
 function Question (id, question, response) {
 	this.id = id;
 	this.question = question;
-	this.response = response;
+	this.reponse = response;
 }
 
 var currentQuestion;
+var nextQuestion;
 var timerDuration = 10000;
 
 
@@ -46,32 +47,48 @@ db.serialize(function() {
   db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
       console.log(row.id + ": " + row.question);
       currentQuestion = new Question (row.id, row.question, row.reponse);
+      getNewQuestion();
   });
 });
 
 
+
+function getNewQuestion() {
+		db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
+  		//console.log("in timer c: "+currentQuestion.question);
+      console.log("in timer q: "+row.question);
+      console.log("in timer r: "+row.reponse);
+      nextQuestion = new Question (row.id, row.question, row.reponse);
+  		});
+}
+
 // timer
 setInterval(function(){
- 
- 	
+
+currentQuestion = nextQuestion;
+
+getNewQuestion();
+
+ 		io.sockets.emit('emit_question', currentQuestion.question);
+  		
+  		
   
-  console.log('Timer Change question '+currentQuestion.question);
-  io.sockets.emit('emit_question', currentQuestion.question);
+  
+  
   var i = (timerDuration/1000);
   var timer = setInterval(function(){  
   		i--;
 	  io.sockets.emit('timer_update', i);
-	  
+	  //console.log('Timer second q:'+currentQuestion.question);
+	  //console.log('Timer second r:'+currentQuestion.reponse);
 	  if(i <= 0) {
 	  	i = (timerDuration/1000);
 	  	clearInterval(timer);
+	  
 	  }
   }, 1000); 
   
- db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
-      console.log(row.id + ": " + row.question);
-      currentQuestion = new Question (row.id, row.question, row.reponse);
-  });
+
   
 }, timerDuration);  
 
@@ -168,8 +185,10 @@ io.sockets.on('connection', function (socket) {
     socket.on('message', function (message) {
 			 socket.get('pseudo', function (error, pseudo) {
             message = ent.encode(message);
-            if(message.toLowerCase() == currentQuestion.response.toLowerCase()) {
+            
+            if(message.toLowerCase() == currentQuestion.reponse.toLowerCase()) {
              	console.log('GOOD RESPONSE !!! '+currentQuestion.response);
+             	
              	io.sockets.emit('good_response', pseudo);
             }
             else {
