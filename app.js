@@ -4,7 +4,7 @@
 
 var express = require('express'),
 	 ent = require('ent'),
-	sio = require('socket.io');
+	 sio = require('socket.io');
 	
 var pg = require('pg');
 var fs = require("fs");
@@ -37,9 +37,10 @@ function Question (id, question, response) {
 	this.question = question;
 	this.reponse = response;
 }
+
 var currentQuestion;
 var nextQuestion;
-var timerDuration = 10000;
+var timerDuration = 30000;	// 30 seconds between each question
 var pointsToWin = 5;
 var bestPlayers = new Array();
 
@@ -64,7 +65,6 @@ function getNewQuestion() {
   		});
 }
 
-
 function getBestPlayers() {
 		var i = 0;
 		bestPlayers = new Array(5);
@@ -83,29 +83,27 @@ function getBestPlayers() {
   		
 }
 
+// set a timer of 30 seconds to refresh questions
 setInterval(function(){
 
 
-io.sockets.emit('time_finish', currentQuestion.reponse);
-currentQuestion = nextQuestion;
+	io.sockets.emit('time_finish', currentQuestion.reponse);
+	currentQuestion = nextQuestion;
 
-getNewQuestion();
-getBestPlayers();
+	getNewQuestion();
+	getBestPlayers();
 		
- 		io.sockets.emit('emit_question', currentQuestion.question);
+ 	io.sockets.emit('emit_question', currentQuestion.question);
   	
-  
-  
-  
+  // set a timer each seconds to refresh remaining time
   var i = (timerDuration/1000);
   var timer = setInterval(function(){  
   		i--;
-	  io.sockets.emit('timer_update', i);
-	  if(i <= 0) {
-	  	i = (timerDuration/1000);
-	  	clearInterval(timer);
-	  
-	  }
+	  	io.sockets.emit('timer_update', i);
+	  	if(i <= 0) {
+	  		i = (timerDuration/1000);
+	  		clearInterval(timer);	  
+		}
   }, 1000); 
   
 
@@ -120,8 +118,6 @@ getBestPlayers();
 app.get('/', function (req, res) {
  res.sendfile(__dirname + '/index.html');
 });
-
-
 
 app.get('/signin',function(req,res){
   res.sendfile( '/signin.html' , {root:__dirname});
@@ -165,7 +161,7 @@ app.post('/signin',function(req,res){
 				res.redirect('/signinvalid');
 				}
 				else {
-					// erreur le pseudo existe deja !!!!!!!!!!!!!
+					// login exist user have to choose another one
 						res.redirect('/signinerror');
 				}
 			});
@@ -181,6 +177,7 @@ app.post('/signin',function(req,res){
  * App listen.
  */
 
+// server will be on localhost:3000
 var port = process.env.PORT || 3000;
 app.listen(port, function () {
   var addr = app.address();
@@ -201,16 +198,16 @@ io.configure(function () {
 
 var users=[];
 
-
+// a new user is connected
 io.sockets.on('connection', function (socket) {
-	 // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
+	 
     socket.on('login', function (user) {
          pseudo = ent.encode(user.pseudo);
 			password= ent.encode(user.password);
 			
-		var dbPassword = "";
-		 console.log("LOGIN");
-		  
+			var dbPassword = "";
+		 	console.log("New login");
+		  	// check login and password in database
 			  db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
 					console.log("db login : "+row.login);
 					console.log("db pass : "+row.password);
@@ -218,17 +215,16 @@ io.sockets.on('connection', function (socket) {
 			  }, function(err, rows) {
 			  if (rows =! 0) {
 				 
-				 console.log("enter : "+password);
-				console.log("dppass : "+dbPassword);
-				if(password == dbPassword && dbPassword != "") {
-				socket.set('pseudo', pseudo);
-				users.push({pseudo:pseudo,password:password});
-		         socket.broadcast.emit('pseudo', pseudo);
-				}
-				else {
+					console.log("enter : "+password);
+					console.log("dppass : "+dbPassword);
+					if(password == dbPassword && dbPassword != "") {
+						socket.set('pseudo', pseudo);
+						users.push({pseudo:pseudo,password:password});
+		      	   socket.broadcast.emit('pseudo', pseudo);
+					}
+					else {
 					socket.emit('redirect');
-					 // wrong password or login redirect with error
-					 
+					 // wrong password or login redirect with error					 
 				}
 			}
 			});
@@ -244,25 +240,22 @@ io.sockets.on('connection', function (socket) {
    });
    
    
-	    // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
+	 // new message received   
     socket.on('message', function (message) {
 			socket.get('pseudo', function (error, pseudo) {
-			console.log("RESPONSE FROM : "+pseudo);
-            message = ent.encode(message);
+		
+         message = ent.encode(message);
             
-            if(message.toLowerCase() == currentQuestion.reponse.toLowerCase()) {
-             	console.log('GOOD RESPONSE !!! '+currentQuestion.reponse);
+         if(message.toLowerCase() == currentQuestion.reponse.toLowerCase()) {
+             	console.log('Good response : '+currentQuestion.reponse);
              	var currentPoints = 0;
              	var id = 0;
              	db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
 					console.log("db points : "+row.points);
 					id = row.id;
-					currentPoints = row.points + pointsToWin;
-					
-					
+					currentPoints = row.points + pointsToWin;					
 			  }, function(err, rows) {
-				  if(rows != 0) {
-					  
+				  if(rows != 0) {					  
 					  // first to have the good response have 5 points, second 3, third 2 and others 1
 					  if(pointsToWin > 1) {
 						  if(pointsToWin == 5) {
@@ -270,6 +263,7 @@ io.sockets.on('connection', function (socket) {
 						  }
 						  pointsToWin--;
 					  }
+					// update points for the user  
 					db.run("UPDATE users SET points = '"+currentPoints+"' WHERE id = ?", id);
 				}
 			}
