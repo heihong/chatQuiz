@@ -40,6 +40,7 @@ function Question (id, question, response) {
 var currentQuestion;
 var nextQuestion;
 var timerDuration = 10000;
+var pointsToWin = 5;
 
 
 db.serialize(function() {  
@@ -47,6 +48,7 @@ db.serialize(function() {
       console.log(row.id + ": " + row.question);
       currentQuestion = new Question (row.id, row.question, row.reponse);
       getNewQuestion();
+      pointsToWin = 5;
   });
 });
 
@@ -54,7 +56,7 @@ db.serialize(function() {
 
 function getNewQuestion() {
 		db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
-  		
+  		pointsToWin = 5;
       console.log("in timer q: "+row.question);
       console.log("in timer r: "+row.reponse);
       nextQuestion = new Question (row.id, row.question, row.reponse);
@@ -80,8 +82,6 @@ getNewQuestion();
   var timer = setInterval(function(){  
   		i--;
 	  io.sockets.emit('timer_update', i);
-	  //console.log('Timer second q:'+currentQuestion.question);
-	  //console.log('Timer second r:'+currentQuestion.reponse);
 	  if(i <= 0) {
 	  	i = (timerDuration/1000);
 	  	clearInterval(timer);
@@ -218,11 +218,19 @@ io.sockets.on('connection', function (socket) {
              	db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
 					console.log("db points : "+row.points);
 					id = row.id;
-					currentPoints = row.points;
-					currentPoints++;
+					currentPoints = row.points + pointsToWin;
+					
 					
 			  }, function(err, rows) {
 				  if(rows != 0) {
+					  
+					  // first to have the good response have 5 points, second 3, third 2 and others 1
+					  if(pointsToWin > 1) {
+						  if(pointsToWin == 5) {
+							  pointsToWin--;
+						  }
+						  pointsToWin--;
+					  }
 					db.run("UPDATE users SET points = '"+currentPoints+"' WHERE id = ?", id);
 				}
 			}
