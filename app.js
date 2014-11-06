@@ -113,14 +113,31 @@ app.get('/signin',function(req,res){
 app.post('/signin',function(req,res){
 	console.log(req.body.user.login);
 	
-	db.serialize(function() {
+	var login = req.body.user.login;
+	var password = req.body.user.password
+	
+	if(login != "" && password != "") {
+	
+	
+	login = login.toLowerCase();
+		db.serialize(function() {	 
+		
+		 
+	  	db.each("SELECT * FROM users WHERE login = '"+login+"' LIMIT 1", function(err, row) {
+      	console.log(row.id + ": " + row.login);
+  		}, function(err, rows) {
+			  if (rows == 0) {
+			  	var stmt = db.prepare("INSERT INTO users VALUES(NULL,?,?,0)");	  
+				stmt.run(login, password); 
+				stmt.finalize();
+				}
+				else {
+					// erreur le pseudo existe deja !!!!!!!!!!!!!
+				}
+			});
   
-  
-	var stmt = db.prepare("INSERT INTO users VALUES(NULL,?,?,0)");
-  
-	stmt.run(req.body.user.login, req.body.user.password); 
-	stmt.finalize();
-});
+		});
+	}
 	
   res.sendfile( '/signin.html' , {root:__dirname});
 
