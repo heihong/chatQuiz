@@ -37,7 +37,6 @@ function Question (id, question, response) {
 	this.question = question;
 	this.reponse = response;
 }
-var nbPointsToWin = 4;
 var currentQuestion;
 var nextQuestion;
 var timerDuration = 10000;
@@ -48,7 +47,6 @@ db.serialize(function() {
       console.log(row.id + ": " + row.question);
       currentQuestion = new Question (row.id, row.question, row.reponse);
       getNewQuestion();
-      nbPointsToWin = 4;
   });
 });
 
@@ -56,14 +54,14 @@ db.serialize(function() {
 
 function getNewQuestion() {
 		db.each("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1", function(err, row) {
-  		//console.log("in timer c: "+currentQuestion.question);
+  		
       console.log("in timer q: "+row.question);
       console.log("in timer r: "+row.reponse);
       nextQuestion = new Question (row.id, row.question, row.reponse);
   		});
 }
 
-// timer
+
 setInterval(function(){
 
 
@@ -74,8 +72,7 @@ getNewQuestion();
 
 		
  		io.sockets.emit('emit_question', currentQuestion.question);
-  		nbPointsToWin = 4;
-  		
+  	
   
   
   
@@ -176,14 +173,14 @@ io.sockets.on('connection', function (socket) {
 			
 		var dbPassword = "";
 		 console.log("LOGIN");
-			//db.serialize(function() {  
+		  
 			  db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
 					console.log("db login : "+row.login);
 					console.log("db pass : "+row.password);
 					dbPassword = row.password;
 			  }, function(err, rows) {
 			  if (rows =! 0) {
-				 //code I want
+				 
 				 console.log("enter : "+password);
 				console.log("dppass : "+dbPassword);
 				if(password == dbPassword && dbPassword != "") {
@@ -196,7 +193,7 @@ io.sockets.on('connection', function (socket) {
 				}
 			}
 			});
-			//});
+			
 		
         
     });  
@@ -210,14 +207,26 @@ io.sockets.on('connection', function (socket) {
    
 	    // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
     socket.on('message', function (message) {
-			 socket.get('pseudo', function (error, pseudo) {
+			socket.get('pseudo', function (error, pseudo) {
+			console.log("RESPONSE FROM : "+pseudo);
             message = ent.encode(message);
             
             if(message.toLowerCase() == currentQuestion.reponse.toLowerCase()) {
              	console.log('GOOD RESPONSE !!! '+currentQuestion.reponse);
-             	
-             	
-             	
+             	var currentPoints = 0;
+             	var id = 0;
+             	db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
+					console.log("db points : "+row.points);
+					id = row.id;
+					currentPoints = row.points;
+					currentPoints++;
+					
+			  }, function(err, rows) {
+				  if(rows != 0) {
+					db.run("UPDATE users SET points = '"+currentPoints+"' WHERE id = ?", id);
+				}
+			}
+			);
              	     	
              	io.sockets.emit('good_response', pseudo);
             }
