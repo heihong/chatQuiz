@@ -41,6 +41,7 @@ var currentQuestion;
 var nextQuestion;
 var timerDuration = 10000;
 var pointsToWin = 5;
+var bestPlayers = new Array();
 
 
 db.serialize(function() {  
@@ -63,10 +64,23 @@ function getNewQuestion() {
   		});
 }
 
+
 function getBestPlayers() {
+		var i = 0;
+		bestPlayers = new Array(5);
+		for(i = 0; i<bestPlayers.length;i++) {
+			bestPlayers[i] = "";
+		}
+		i = 0;
 		db.each("SELECT * FROM users ORDER BY points DESC LIMIT 5", function(err, row) {
-  			console.log("best player : "+row.login+" - "+row.points);
+  			console.log("best player : "+row.login+" : "+row.points);
+  			bestPlayers[i] = row.login+" : "+row.points+" points";
+  			i++;
+  		}, function(err, rows) {
+  			io.sockets.emit('best_players_update', {p1: bestPlayers[0], p2: bestPlayers[1], p3: bestPlayers[2], p4: bestPlayers[3], p5: bestPlayers[4]});
   		});
+  		
+  		
 }
 
 setInterval(function(){

@@ -15,6 +15,7 @@
 		 $(document).ready(function(){
 		  $('#chat_user').hide();
 		  $('#timer').hide();
+		  $('#best_players_update').hide();
 		  $('#zone_chat').hide();
 		})
 		
@@ -67,6 +68,7 @@
 			   $('#signin').hide();
 			   $('#chat_user').show();
 			   $('#timer').show();
+			   $('#best_players_update').show();
 			 })
 		   }
 		   
@@ -89,8 +91,25 @@
                
             });
        
+		
+				socket.on('best_players_update', function(players) {
+				
+				
+				
+				 $('#best_players').html("");
+				 $('#best_players').append("Meilleurs joueurs : <br />");		        						    
+					$('#best_players').append(players.p1+' | ');
+					$('#best_players').append(players.p2+' | ');
+					$('#best_players').append(players.p3+' | ');
+					$('#best_players').append(players.p4+' | ');
+					$('#best_players').append(players.p5);
+					
+    			
+            });
+            
 			
 			socket.on('message', function(data) {
+			
                 $('#zone_chat').append('<p class="form-control-static color-info"><b>'+data.pseudo+'</b>: '+data.message+'</p>');
             });
 		
@@ -114,6 +133,7 @@
 			 <div class="col-sm-12  col-xs-12">
 				 <div id="pseudo_user"></div>
 				 <div id="timer"></div>
+				 <div id="best_players"></div>
 				 <br/>
 					<div id="user" >
 						<form action="/" method="post" id="connection">
