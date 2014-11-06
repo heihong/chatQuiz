@@ -49,6 +49,12 @@
                 var elem = document.getElementById('zone_chat');
   					elem.scrollTop = elem.scrollHeight;
           });
+          
+          socket.on('time_finish', function(reponse) {
+                $('#zone_chat').append('<p class="form-control-static"><em>Temps écoulé, la bonne réponse était : <b>'+ reponse + '</b></em></p>');
+                var elem = document.getElementById('zone_chat');
+  					elem.scrollTop = elem.scrollHeight;
+          });
 		  
 			// Ajoute un message dans la page
             function inserePseudo(pseudo) {

@@ -37,7 +37,7 @@ function Question (id, question, response) {
 	this.question = question;
 	this.reponse = response;
 }
-
+var nbPointsToWin = 4;
 var currentQuestion;
 var nextQuestion;
 var timerDuration = 10000;
@@ -48,6 +48,7 @@ db.serialize(function() {
       console.log(row.id + ": " + row.question);
       currentQuestion = new Question (row.id, row.question, row.reponse);
       getNewQuestion();
+      nbPointsToWin = 4;
   });
 });
 
@@ -65,12 +66,15 @@ function getNewQuestion() {
 // timer
 setInterval(function(){
 
+
+io.sockets.emit('time_finish', currentQuestion.reponse);
 currentQuestion = nextQuestion;
 
 getNewQuestion();
 
+		
  		io.sockets.emit('emit_question', currentQuestion.question);
-  		
+  		nbPointsToWin = 4;
   		
   
   
@@ -145,6 +149,8 @@ io.configure(function () {
 });
 
 var users=[];
+
+
 io.sockets.on('connection', function (socket) {
 	 // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
     socket.on('login', function (user) {
@@ -152,25 +158,29 @@ io.sockets.on('connection', function (socket) {
 			password= ent.encode(user.password);
 			
 		var dbPassword = "";
-		
-		db.serialize(function() {  
+		 console.log("LOGIN");
+			//db.serialize(function() {  
 			  db.each("SELECT * FROM users WHERE login = '"+pseudo+"' LIMIT 1", function(err, row) {
-					console.log(row.login);
+					console.log("db login : "+row.login);
+					console.log("db pass : "+row.password);
 					dbPassword = row.password;
-			  });
+			  }, function(err, rows) {
+			  if (rows =! 0) {
+				 //code I want
+				 console.log("enter : "+password);
+				console.log("dppass : "+dbPassword);
+				if(password == dbPassword && dbPassword != "") {
+				socket.set('pseudo', pseudo);
+				users.push({pseudo:pseudo,password:password});
+		         socket.broadcast.emit('pseudo', pseudo);
+				}
+				else {
+					 // wrong password or login redirect with error
+				}
+			}
 			});
+			//});
 		
-		   
-			if(password == dbPassword) {
-			socket.set('pseudo', pseudo);
-			users.push({pseudo:pseudo,password:password});
-            socket.broadcast.emit('pseudo', pseudo);
-		   }
-		   else {
-		   	 // wrong password or login
-		   }
-			
-			
         
     });  
 	
@@ -187,8 +197,11 @@ io.sockets.on('connection', function (socket) {
             message = ent.encode(message);
             
             if(message.toLowerCase() == currentQuestion.reponse.toLowerCase()) {
-             	console.log('GOOD RESPONSE !!! '+currentQuestion.response);
+             	console.log('GOOD RESPONSE !!! '+currentQuestion.reponse);
              	
+             	
+             	
+             	     	
              	io.sockets.emit('good_response', pseudo);
             }
             else {
