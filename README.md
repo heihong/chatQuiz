@@ -3,7 +3,7 @@
 Read me
 =========
 
-#### Projet d'application web : Quiz temps réel multijoueur.
+##### Projet d'application web : Quiz temps réel multijoueur.
 #### Groupe : GUILLEBAUD Vincent	TRAING Hei-Hong
 
 Objectif : 
