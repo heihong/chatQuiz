@@ -15,11 +15,11 @@ Les utilisateurs ont une seule zone pour discuter avec les autres utilisateurs e
 
 ##### Choix techniques :
 
-*NodeJs :* afin de réaliser le quiz en temps réel nous devions utiliser les web socket pour synchroniser le jeu avec tous les utilisateurs. Nous avons choisi d’utiliser NodeJs car il est assez simple d’utiliser les web socket dans ce langage de plus nous souhaitions progresser en Javascript.
+**NodeJs :** afin de réaliser le quiz en temps réel nous devions utiliser les web socket pour synchroniser le jeu avec tous les utilisateurs. Nous avons choisi d’utiliser NodeJs car il est assez simple d’utiliser les web socket dans ce langage de plus nous souhaitions progresser en Javascript.
 
-*SQLite :* Pour la persistance des données nous avons choisi d’utiliser SQLIte. Cette base de donnée est simple d’utilisation et ne nécessite pas d’installation particulière ce qui était plus simple pour déployer notre projet en ligne.
+**SQLite :** Pour la persistance des données nous avons choisi d’utiliser SQLIte. Cette base de donnée est simple d’utilisation et ne nécessite pas d’installation particulière ce qui était plus simple pour déployer notre projet en ligne.
 
-*Bootstrap :* nous souhaitions avoir un design sobre et accessible sur tous types d’appareils. Pour cela nous avons utilisé Bootstrap afin d’avoir une mise en page responsive.
+**Bootstrap :** nous souhaitions avoir un design sobre et accessible sur tous types d’appareils. Pour cela nous avons utilisé Bootstrap afin d’avoir une mise en page responsive.
 
 ##### Sources et déploiement : 
 
