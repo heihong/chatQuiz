@@ -5,7 +5,6 @@
   "dependencies": {
     "ent": "~0.1.0",
     "express": "2.5.5",
-    "pg": "2.x",
     "socket.io": "0.9.1-1",
     "sqlite3": "^3.0.2"
   },

@@ -6,7 +6,7 @@ var express = require('express'),
 	 ent = require('ent'),
 	 sio = require('socket.io');
 	
-var pg = require('pg');
+
 var fs = require("fs");
 var sqlite3 = require("sqlite3").verbose();
 
