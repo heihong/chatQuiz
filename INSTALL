@@ -1,10 +1,10 @@
-#### Installation : 
+Installation : 
 
-##### Sur Windows /MAC
+Sur Windows /MAC
 
 	Installer Node à partir du site suivant : http://nodejs.org/download/
 	
-##### Sur Ubuntu
+Sur Ubuntu
 
 	Sur une version récente entrer la commande suivante :
 		sudo apt-get install nodejs nodejs-dev npm
@@ -15,24 +15,24 @@
 		sudo apt-get update
 		sudo apt-get install nodejs nodejs-dev npm
 		
-##### Pour vérifier que npm est bien installé 
+Pour vérifier que npm est bien installé 
 	npm --v
 
-##### Installer Git Bash si vous avez Windows
+Installer Git Bash si vous avez Windows
 	Cela va permettre d’entrer des commandes linux pour installer bower :
 	http://git-scm.com/downloads
 
-##### Installer bower avec la commande suivante :
+Installer bower avec la commande suivante :
 	npm install –g bower
 
-##### Pour vérifier que bower est bien installé entrer la commande :
+Pour vérifier que bower est bien installé entrer la commande :
 	bower--v
 	
-##### Récupéré le projet sur github : https://github.com/heihong/chatQuiz
+Récupéré le projet sur github : https://github.com/heihong/chatQuiz
 
-##### Installer le projet en lançant les commandes dans le dossier du projet :
+Installer le projet en lançant les commandes dans le dossier du projet :
 	npm install
 	bower install
 	
-##### Exécuter le projet en lançant la commande suivante :
+Exécuter le projet en lançant la commande suivante :
 	node app.js
