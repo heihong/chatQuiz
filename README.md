@@ -23,7 +23,7 @@ Les utilisateurs ont une seule zone pour discuter avec les autres utilisateurs e
 
 ##### Sources et déploiement : 
 
-Nous avons souhaité déployé notre projet sur un serveur en ligne. Nous avons rencontré plusieurs difficultés pour déployer l’application. Après de nombreux essais, le système de chat et de quiz en ligne fonctionne, toutefois l’inscription ne fonctionne pas. 
+Nous avons souhaité déployé notre projet sur un serveur en ligne. Nous avons rencontré plusieurs difficultés pour déployer l’application. Après de nombreux essais, le système de chat et de quiz en ligne fonctionne, toutefois l’inscription ne fonctionne pas en ligne mais l'ensemble du projet fonctionne en local. 
 
 La version en ligne du projet est disponible à l’adresse suivante : http://multiplayer-quiz-game.herokuapp.com/ 
 il est possible d’utiliser l’identifiant suivant :
